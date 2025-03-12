@@ -19,8 +19,7 @@ jobs:
         python-version: 3.9
 
     - name: Install dependencies
-      run: pip install requests
-      run: pip install PyNaCl
+      run: pip install requests PyNaCl
 
     - name: Run script to get new refresh token
       env:
