@@ -1,0 +1,47 @@
+name: Update Refresh Token
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"  # Se ejecuta cada 6 horas
+  workflow_dispatch:  # Permite ejecución manual
+
+jobs:
+  update_token:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+
+    - name: Install dependencies
+      run: pip install requests
+
+    - name: Run script to get new refresh token
+      env:
+        CONFIG_ID: ${{ secrets.CONFIG_ID }}
+        CONFIG_KEY: ${{ secrets.CONFIG_KEY }}
+        REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+      run: |
+        python main.py
+        cat new_token.txt || echo "No token found!"
+
+    - name: Update GitHub Secret
+      env:
+        GH_PAT: ${{ secrets.GH_PAT }}
+      run: |
+        NEW_TOKEN=$(cat new_token.txt)
+        if [ -z "$NEW_TOKEN" ]; then
+          echo "Error: No new refresh token found!"
+          exit 1
+        fi
+        
+        echo "Updating GitHub Secret..."
+        curl -X PUT "https://api.github.com/repos/${{ github.repository }}/actions/secrets/REFRESH_TOKEN" \
+        -H "Authorization: token $GH_PAT" \
+        -H "Accept: application/vnd.github.v3+json" \
+        -d "{\"encrypted_value\":\"$NEW_TOKEN\"}"
