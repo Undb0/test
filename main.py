@@ -57,16 +57,15 @@ def encrypt_secret(public_key: str, secret_value: str) -> str:
     encrypted = sealed_box.encrypt(secret_value.encode("utf-8"))
     return b64encode(encrypted).decode("utf-8")
 
-def update_github_secret(repo, secret_name, secret_value):
+def update_github_secret(secret_name, secret_value):
     headers = {'Authorization': f'token {GITHUB_PAT}', 'Accept': 'application/vnd.github.v3+json'}
-    repo_name = repo.replace('https://github.com/', '')
 
     # Obtener la clave pública del repositorio
     pubkey_url = f'https://api.github.com/repos/{repo_name}/actions/secrets/public-key'
     response = requests.get(pubkey_url, headers=headers)
 
     if response.status_code != 200:
-        print(f"Error obteniendo la clave pública para {repo}: {response.text}")
+        print(f"Error obteniendo la clave pública para {repo_name}: {response.text}")
         return
 
     public_key_info = response.json()
@@ -78,9 +77,9 @@ def update_github_secret(repo, secret_name, secret_value):
 
     put_response = requests.put(secret_url, headers=headers, json=data)
     if put_response.status_code in [201, 204]:
-        print(f"Secreto actualizado correctamente en {repo}")
+        print(f"Secreto actualizado correctamente en {repo_name}")
     else:
-        print(f"Error actualizando secreto en {repo}: {put_response.text}")
+        print(f"Error actualizando secreto en {repo_name}: {put_response.text}")
 
 def get_access_token(refresh_token, client_id, client_secret):
     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
@@ -102,7 +101,7 @@ def get_access_token(refresh_token, client_id, client_secret):
     access_token = jsontxt['access_token']
 
     # Guardar el nuevo refresh token en un archivo
-    update_github_secret(repo, 'REFRESH_TOKEN', new_refresh_token)
+    update_github_secret('REFRESH_TOKEN', new_refresh_token)
 
     return access_token
 
