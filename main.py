@@ -35,6 +35,15 @@ calls = [
     'https://graph.microsoft.com/v1.0/sites/root/drives'
 ]
 
+# Obtener valores de los secrets de GitHub (variables de entorno)
+refresh_token = os.getenv("REFRESH_TOKEN")
+client_id = os.getenv("CONFIG_ID")
+client_secret = os.getenv("CONFIG_KEY")
+
+if not refresh_token or not client_id or not client_secret:
+    print("❌ ERROR: Faltan variables de entorno. Verifica los secrets en GitHub.")
+    exit(1)
+
 def get_access_token(refresh_token, client_id, client_secret):
     headers = {'Content-Type': 'application/x-www-form-urlencoded'}
     data = {
@@ -48,7 +57,7 @@ def get_access_token(refresh_token, client_id, client_secret):
     jsontxt = response.json()
 
     if 'error' in jsontxt:
-        print("Error obteniendo token:", jsontxt)
+        print("❌ ERROR obteniendo token:", jsontxt)
         return None, None
 
     new_refresh_token = jsontxt['refresh_token']
@@ -73,9 +82,9 @@ def main():
         try:
             response = session.get(endpoint)
             if response.status_code == 200:
-                print(f'{num} - Call successful: {endpoint}')
+                print(f'{num} - ✅ Call successful: {endpoint}')
         except requests.exceptions.RequestException as e:
-            print("Request failed:", e)
+            print("❌ Request failed:", e)
 
 if __name__ == "__main__":
     main()
