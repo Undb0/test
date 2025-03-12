@@ -44,6 +44,7 @@ refresh_token = os.getenv("REFRESH_TOKEN")
 client_id = os.getenv("CONFIG_ID")
 client_secret = os.getenv("CONFIG_KEY")
 GITHUB_PAT = os.getenv("GH_PAT")
+repo_name = os.getenv("REPO")
 
 
 if not refresh_token or not client_id or not client_secret:
