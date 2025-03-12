@@ -27,6 +27,7 @@ jobs:
         CONFIG_KEY: ${{ secrets.CONFIG_KEY }}
         REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
         GH_PAT: ${{ secrets.GH_PAT }}
+        REPO: ${{ github.repository }}
       run: |
         python main.py
         cat new_token.txt || echo "No token found!"
