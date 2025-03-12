@@ -1,7 +1,8 @@
+import os
 import requests
 import json
 import time
-import random 
+import random
 
 # Register the azure app first and make sure the app has the following permissions:
 # files: Files.Read.All、Files.ReadWrite.All、Sites.Read.All、Sites.ReadWrite.All
